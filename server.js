@@ -19,7 +19,6 @@ app.post('/api/resize-image', upload.single('image'), (req, res) => {
     return res.status(400).send('No image uploaded.');
   }
   const imageBuffer = req.file.buffer;
-  console.log('got file 😍');
   sharp(imageBuffer)
     .resize({ width: 1920 })
     .toFormat('jpeg')

@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [resizedImage, setResizedImage] = useState('');
   const [image, setImage] = useState('');
+  const containerRef = useRef(null);
+  const childRef = useRef(null);
 
   useEffect(() => {
     if (selectedFile) {
@@ -51,7 +53,15 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-l from-blue-300 to-purple-600">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
+      <div
+        className="bg-white px-1 py-1 rounded-lg shadow-lg md:max-h-[none] max-h-[80vh] w-[90%] md:w-full"
+        ref={containerRef}
+        style={{
+          transition: 'height 0.5s ease-in-out',
+          overflow: 'hidden',
+          height: image ? '700px' : '200px',
+        }}
+      >
         <input
           type="file"
           accept="image/*"
@@ -59,8 +69,9 @@ export default function App() {
           className="mb-4 p-2 border border-gray-300 rounded-lg"
         />
         <div
+          ref={childRef}
           style={{
-            width: '400px',
+            maWidth: '400px',
             transition: 'all 0.5s ease-in-out',
             transform: image ? 'scale(1)' : 'scale(0)',
           }}

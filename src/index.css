@@ -23,4 +23,5 @@ code {
   background-repeat: no-repeat; /* this is important */
   border: 2px solid transparent;
   border-radius: 8px;
+  box-sizing: border-box;
 }
