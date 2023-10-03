@@ -1,9 +1,8 @@
 const express = require('express');
 const sharp = require('sharp');
 const multer = require('multer');
-const path = require('path');
 const cors = require('cors');
-const fs = require('fs');
+const uuid = require('uuid');
 
 const app = express();
 const port = 3300;
@@ -14,29 +13,62 @@ const upload = multer({ storage: storage });
 app.use(express.json());
 app.use(cors());
 
-app.post('/api/resize-image', upload.single('image'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).send('No image uploaded.');
-  }
-  const imageBuffer = req.file.buffer;
-  sharp(imageBuffer)
-    .resize({ width: 1920 })
-    .toFormat('jpeg')
-    .toBuffer()
-    .then((outputBuffer) => {
-      const savePath = path.join(__dirname, 'image/');
-      // For example, saving it as a file:
-      fs.writeFileSync(
-        path.join(savePath, 'resized-image.jpg'),
-        outputBuffer
-      );
+function generateUniqueId() {
+  return uuid.v4();
+}
+// --- we in need to  resize only one image
+// app.post('/api/resize-image', upload.single('image'), (req, res) => {
+//   if (!req.files || req.files.length === 0) {
+//     return res.status(400).send('No images uploaded.');
+//   }
+//   console.log('got images 🎇');
+//   const resizedImages = [];
+//   const imageBuffer = req.file.buffer;
+//   sharp(imageBuffer)
+//     .resize({ width: 1920 })
+//     .toFormat('jpeg')
+//     .toBuffer()
+//     .then((outputBuffer) => {
+//       const imageName = `${Date.now()}_${Math.floor(
+//         Math.random() * 1000
+//       )}.jpg`;
 
-      res.send(outputBuffer);
-    })
-    .catch((err) => {
-      console.error('Error resizing image', err);
-      res.status(500).send('Error resizing image.');
-    });
+//       res.send(outputBuffer);
+//     })
+//     .catch((err) => {
+//       console.error('Error resizing image', err);
+//       res.status(500).send('Error resizing image.');
+//     });
+// });
+
+app.post('/api/resize-images', upload.any(), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).send('No images uploaded.');
+    }
+
+    const resizedImages = [];
+    for (const file of req.files) {
+      const outputBuffer = await sharp(file.buffer)
+        .resize({ width: 1920 })
+        .toFormat('jpeg')
+        .toBuffer();
+
+      const imageName = `${Date.now()}_${Math.floor(
+        Math.random() * 1000
+      )}.jpg`;
+      const imageId = generateUniqueId();
+      resizedImages.push({
+        id: imageId,
+        name: imageName,
+        data: outputBuffer,
+      });
+    }
+    res.send({ resizedImages });
+  } catch (error) {
+    console.error('Error resizing images', error);
+    res.status(500).send('Error resizing images.');
+  }
 });
 
 app.listen(port, () => {

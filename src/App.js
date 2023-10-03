@@ -1,100 +1,136 @@
 import { useState, useEffect, useRef } from 'react';
+import Logo from './Logo';
 
 export default function App() {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [resizedImage, setResizedImage] = useState('');
-  const [image, setImage] = useState('');
+  const [resizedImages, setResizedImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [animate, setAnimate] = useState(false);
   const containerRef = useRef(null);
   const childRef = useRef(null);
 
-  useEffect(() => {
-    if (selectedFile) {
-      uploadImage(selectedFile);
-    }
-  }, [selectedFile]);
+  const handleFilesChange = async (event) => {
+    const files = Array.from(event.target.files);
+    const formData = new FormData();
+    try {
+      await Promise.all(
+        files.map(async (file, index) => {
+          await formData.append(`image${index}`, file);
+        })
+      );
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setImage(reader.result);
-    };
-    reader.readAsDataURL(file);
+      const formDataIsEmpty = formData.get('image0') === null;
+
+      if (formDataIsEmpty) {
+        console.log('formData is empty');
+        return;
+      } else {
+        uploadMultiplyImages(formData);
+      }
+    } catch (error) {
+      console.error('Error while populating formData:', error);
+    }
   };
 
-  const uploadImage = (file) => {
-    const formData = new FormData();
-    formData.append('image', file);
+  const uploadMultiplyImages = async (formData) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        'http://localhost:3300/api/resize-images',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
 
-    fetch('http://localhost:3300/api/resize-image', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((response) => response.blob())
-      .then((data) => {
-        // Handle the resized image data here, e.g., display it or save it.
-        // Set the image URL once it's ready
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-        console.log('image resized successfully ');
-        const imageUrl = URL.createObjectURL(data);
-        const parts = imageUrl.split('/');
-        const uuid = parts[parts.length - 1];
-        const resizedImage = {
-          name: uuid,
-          image: imageUrl,
+      const responseData = await response.json();
+      const resizedImagesArray = responseData.resizedImages;
+      const images = [];
+      resizedImagesArray.forEach((image) => {
+        const uint8Array = new Uint8Array(image.data.data);
+        const imageBlob = new Blob([uint8Array], {
+          type: 'image/jpeg',
+        });
+        const imageUrl = URL.createObjectURL(imageBlob);
+        const imageObject = {
+          imageUrl,
+          id: image.id,
+          name: image.name,
         };
-        setResizedImage(resizedImage);
-      })
-      .catch((error) => {
-        console.error('Error uploading image', error);
+
+        images.push(imageObject);
       });
+      setResizedImages(images);
+      setAnimate(true);
+    } catch (error) {
+      console.error('Error uploading image', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-l from-blue-300 to-purple-600">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-l from-blue-300 to-purple-600">
+      <Logo />
       <div
-        className="bg-white px-1 py-1 rounded-lg shadow-lg md:max-h-[none] max-h-[80vh] w-[90%] md:w-full"
+        className="bg-white overflow-auto  m-5 px-1 py-1 rounded-lg shadow-lg h-[90%] w-[90%] md:w-[70%]"
         ref={containerRef}
         style={{
           transition: 'height 0.5s ease-in-out',
           overflow: 'hidden',
-          height: image ? '700px' : '200px',
+          height: resizedImages ? 'auto' : '200px',
         }}
       >
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="mb-4 p-2 border border-gray-300 rounded-lg"
-        />
-        <div
-          ref={childRef}
-          style={{
-            maWidth: '400px',
-            transition: 'all 0.5s ease-in-out',
-            transform: image ? 'scale(1)' : 'scale(0)',
-          }}
-          className={image ? 'wrapper' : ''}
-        >
-          {image && (
-            <img
-              src={image}
-              alt="client"
-              className="w-full h-full object-cover"
-            />
-          )}
-          {resizedImage && (
-            <a
-              href={resizedImage?.image}
-              download={resizedImage.name + '.jpg'}
-              className="block text-center bg-gradient-to-r from-gray-900 via-gray-900 to-white text-white px-4 py-2  hover:bg-gray-900 hover:underline"
-            >
-              Download Resized Image
-            </a>
-          )}
+        <form className="flex flex-wrap gap-10">
+          <input
+            type="file"
+            accept="image/*"
+            name="images"
+            onChange={handleFilesChange}
+            className="mb-4 p-2 border border-gray-300 rounded-lg"
+            multiple
+          />
+          {isLoading && <Loader />}
+        </form>
+        <div className="flex flex-wrap gap-5" ref={childRef}>
+          {resizedImages.length > 0 &&
+            resizedImages.map((image, index) => (
+              <div
+                key={image.id}
+                style={{
+                  maxWidth: '300px',
+                  transition: 'all 0.5s ease-in-out',
+                  transform: animate ? 'scale(1)' : 'scale(0)',
+                }}
+                className={animate ? 'wrapper borderAnimated' : ''}
+              >
+                <span className="flex flex-col h-[100%]">
+                  <img
+                    src={image.imageUrl}
+                    alt={image.name}
+                    data-id={image.id}
+                    data-name={image.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <a
+                    href={image?.imageUrl}
+                    download={image.name}
+                    className="block text-center bg-gradient-to-r from-gray-900 via-gray-900 to-white text-white px-4 py-2  hover:bg-gray-900 hover:underline"
+                  >
+                    Download Resized Image
+                  </a>
+                </span>
+              </div>
+            ))}
         </div>
       </div>
     </div>
   );
+}
+
+function Loader() {
+  return <span class="loader"></span>;
 }

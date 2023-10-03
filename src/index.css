@@ -17,11 +17,92 @@ code {
 }
 
 .wrapper {
-  background: linear-gradient(#222, #222),
-    linear-gradient(to right, rgb(100, 45, 45), purple);
-  background-origin: padding-box, border-box;
-  background-repeat: no-repeat; /* this is important */
-  border: 2px solid transparent;
-  border-radius: 8px;
   box-sizing: border-box;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: relative;
+  animation: rotate 1s linear infinite;
+}
+.loader::before,
+.loader::after {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0px;
+  border-radius: 50%;
+  border: 5px solid rgb(23, 22, 22);
+  animation: prixClipFix 2s linear infinite;
+}
+.loader::after {
+  border-color: #ff3d00;
+  animation: prixClipFix 2s linear infinite,
+    rotate 0.5s linear infinite reverse;
+  inset: 6px;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes prixClipFix {
+  0% {
+    clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0);
+  }
+  25% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0);
+  }
+  50% {
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      100% 0,
+      100% 100%,
+      100% 100%,
+      100% 100%
+    );
+  }
+  75% {
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%,
+      0 100%
+    );
+  }
+  100% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0);
+  }
+}
+
+.borderAnimated {
+  --g: 4px; /* the gap */
+  --b: 8px; /* border thickness*/
+  --c: #851c93; /* the color */
+
+  padding: calc(var(--g) + var(--b));
+  --_c: #0000 0 25%, var(--c) 0 50%;
+  --_g1: repeating-linear-gradient(90deg, var(--_c)) repeat-x;
+  --_g2: repeating-linear-gradient(180deg, var(--_c)) repeat-y;
+  background: var(--_g1) var(--_p, 25%) 0,
+    var(--_g2) 0 var(--_p, 125%), var(--_g1) var(--_p, 125%) 100%,
+    var(--_g2) 100% var(--_p, 25%);
+  background-size: 200% var(--b), var(--b) 200%;
+  cursor: pointer;
+  filter: grayscale(50%);
+  transition: 0.3s;
+}
+.borderAnimated:hover {
+  --_p: 75%;
+  filter: grayscale(0%);
 }
