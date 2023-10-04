@@ -5,7 +5,10 @@ const params = {
   width: '',
   height: '',
 };
-const apiUrl = process.env.BASE_URL || 'http://localhost:3300';
+const apiUrl =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3300'
+    : process.env.REACT_APP_BASE_URL;
 export default function App() {
   const [resizedImages, setResizedImages] = useState([]);
   const [sizes, setSizes] = useState(params);
@@ -41,7 +44,7 @@ export default function App() {
       console.error('Error while populating formData:', error);
     }
   };
-
+  console.log(process.env.NODE_ENV);
   const uploadMultiplyImages = async (formData) => {
     setIsLoading(true);
     try {
@@ -95,7 +98,7 @@ export default function App() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-l from-blue-300 to-purple-600">
       <Logo />
       <div
-        className="bg-white overflow-auto  m-5 px-1 py-1 rounded-lg shadow-lg h-[90%] w-[90%] md:w-[70%]"
+        className="bg-white overflow-auto  m-1 md:m-5 px-1 py-1 rounded-lg shadow-lg h-[90%] w-[90%] md:w-[70%]"
         ref={containerRef}
         style={{
           transition: 'height 0.5s ease-in-out',

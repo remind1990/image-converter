@@ -1,10 +1,10 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
 const express = require('express');
 const sharp = require('sharp');
 const multer = require('multer');
 const cors = require('cors');
 const uuid = require('uuid');
-
+dotenv.config({ path: './.env' });
 const app = express();
 const PORT = process.env.PORT || 3300;
 
