@@ -54,7 +54,7 @@ export default function App() {
         queryParams.append('keys', JSON.stringify(sizes.keys));
       }
 
-      const url = `http://localhost:3300/api/resize-images?${queryParams.toString()}`;
+      const url = `/api/resize-images?${queryParams.toString()}`;
 
       const response = await fetch(url, {
         method: 'POST',

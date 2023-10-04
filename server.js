@@ -5,7 +5,7 @@ const cors = require('cors');
 const uuid = require('uuid');
 
 const app = express();
-const port = 3300;
+const port = 3000;
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
