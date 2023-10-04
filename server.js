@@ -5,7 +5,7 @@ const cors = require('cors');
 const uuid = require('uuid');
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3300;
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -76,6 +76,6 @@ app.post('/api/resize-images', upload.any(), async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

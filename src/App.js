@@ -5,7 +5,7 @@ const params = {
   width: '',
   height: '',
 };
-
+const apiUrl = process.env.BASE_URL || 'http://localhost:3300';
 export default function App() {
   const [resizedImages, setResizedImages] = useState([]);
   const [sizes, setSizes] = useState(params);
@@ -53,8 +53,7 @@ export default function App() {
         queryParams.append('height', sizes.height);
         queryParams.append('keys', JSON.stringify(sizes.keys));
       }
-
-      const url = `/api/resize-images?${queryParams.toString()}`;
+      const url = `${apiUrl}/api/resize-images?${queryParams.toString()}`;
 
       const response = await fetch(url, {
         method: 'POST',
@@ -175,5 +174,5 @@ export default function App() {
 }
 
 function Loader() {
-  return <span class="loader"></span>;
+  return <span className="loader"></span>;
 }
