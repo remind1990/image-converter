@@ -6,8 +6,8 @@ const params = {
   height: '',
 };
 const apiUrl =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:3300'
+  process.env.NODE_ENV === 'production'
+    ? 'http://localhost:3300/'
     : process.env.REACT_APP_BASE_URL;
 export default function App() {
   const [resizedImages, setResizedImages] = useState([]);
@@ -44,21 +44,20 @@ export default function App() {
       console.error('Error while populating formData:', error);
     }
   };
-  console.log(process.env.NODE_ENV);
+
   const uploadMultiplyImages = async (formData) => {
     setIsLoading(true);
     try {
       const queryParams = new URLSearchParams();
 
       if (sizes?.width !== '' && sizes?.height !== '') {
-        // Add query parameters if sizes.width and sizes.height are not empty
         queryParams.append('width', sizes.width);
         queryParams.append('height', sizes.height);
         queryParams.append('keys', JSON.stringify(sizes.keys));
       }
-      console.log(apiUrl);
-      const url = `/api/resize-images?${queryParams.toString()}`;
 
+      const url = `${apiUrl}api/resize-images?${queryParams.toString()}`;
+      console.log(url);
       const response = await fetch(url, {
         method: 'POST',
         body: formData,
