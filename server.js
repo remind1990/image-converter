@@ -42,15 +42,20 @@ function generateUniqueId() {
 // });
 
 app.post('/api/resize-images', upload.any(), async (req, res) => {
+  console.log('request recieved ');
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).send('No images uploaded.');
     }
+    const { width, height } = req.query;
 
     const resizedImages = [];
     for (const file of req.files) {
       const outputBuffer = await sharp(file.buffer)
-        .resize({ width: 1920 })
+        .resize({
+          width: width ? Number(width) : 1920,
+          height: height ? Number(height) : undefined,
+        })
         .toFormat('jpeg')
         .toBuffer();
 

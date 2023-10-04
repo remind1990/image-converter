@@ -1,13 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import Logo from './Logo';
 
+const params = {
+  width: '',
+  height: '',
+};
+
 export default function App() {
   const [resizedImages, setResizedImages] = useState([]);
+  const [sizes, setSizes] = useState(params);
   const [isLoading, setIsLoading] = useState(false);
   const [animate, setAnimate] = useState(false);
   const containerRef = useRef(null);
   const childRef = useRef(null);
 
+  const handleSizesChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value);
+    setSizes({ ...sizes, [name]: value });
+  };
   const handleFilesChange = async (event) => {
     const files = Array.from(event.target.files);
     const formData = new FormData();
@@ -34,13 +45,21 @@ export default function App() {
   const uploadMultiplyImages = async (formData) => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        'http://localhost:3300/api/resize-images',
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
+      const queryParams = new URLSearchParams();
+
+      if (sizes?.width !== '' && sizes?.height !== '') {
+        // Add query parameters if sizes.width and sizes.height are not empty
+        queryParams.append('width', sizes.width);
+        queryParams.append('height', sizes.height);
+        queryParams.append('keys', JSON.stringify(sizes.keys));
+      }
+
+      const url = `http://localhost:3300/api/resize-images?${queryParams.toString()}`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData,
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -93,6 +112,30 @@ export default function App() {
             className="mb-4 p-2 border border-gray-300 rounded-lg"
             multiple
           />
+          <div className="flex justify-center items-baseline">
+            <label htmlFor="width" className="mr-5">
+              Width
+            </label>
+            <input
+              type="number"
+              name="width"
+              value={sizes.width}
+              onChange={handleSizesChange}
+              className="mb-4 p-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+          <div className="flex justify-center items-baseline">
+            <label htmlFor="height" className="mr-5">
+              Height
+            </label>
+            <input
+              type="number"
+              name="height"
+              value={sizes.height}
+              onChange={handleSizesChange}
+              className="mb-4 p-2 border border-gray-300 rounded-lg"
+            />
+          </div>
           {isLoading && <Loader />}
         </form>
         <div className="flex flex-wrap gap-5" ref={childRef}>
