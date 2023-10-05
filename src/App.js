@@ -55,7 +55,9 @@ export default function App() {
         queryParams.append('keys', JSON.stringify(sizes.keys));
       }
 
-      const url = `${apiUrl}api/resize-images?${queryParams.toString()}`;
+      const url = `${
+        process.env.REACT_APP_BASE_URL
+      }api/resize-images?${queryParams.toString()}`;
 
       console.log(url);
       const response = await fetch(url, {
