@@ -42,7 +42,7 @@ function generateUniqueId() {
 //     });
 // });
 
-app.post('api/resize-images', upload.any(), async (req, res) => {
+app.post('/api/resize-images', upload.any(), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).send('No images uploaded.');
