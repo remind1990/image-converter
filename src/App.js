@@ -55,7 +55,7 @@ export default function App() {
         queryParams.append('keys', JSON.stringify(sizes.keys));
       }
       const testUrl = 'http://localhost:3300';
-      const url = `https://sunrise-image-converter.herokuapp.com/api/resize-images`;
+      const url = `https://sunrise-image-converter-c88a9cda0bbb.herokuapp.com`;
       console.log('hardcoded link');
       console.log(url);
       const response = await fetch(url, {
