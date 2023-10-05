@@ -55,8 +55,8 @@ export default function App() {
         queryParams.append('keys', JSON.stringify(sizes.keys));
       }
 
-      const url = `${apiUrl}/api/resize-images?${queryParams.toString()}`;
-
+      const url = `/api/resize-images?${queryParams.toString()}`;
+      console.log('link is not specified');
       console.log(url);
       const response = await fetch(url, {
         method: 'POST',
