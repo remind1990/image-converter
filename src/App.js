@@ -6,7 +6,7 @@ const params = {
   height: '',
 };
 const apiUrl =
-  process.env.NODE_ENV === 'production'
+  process.env.NODE_ENV === 'development'
     ? 'http://localhost:3300/'
     : process.env.REACT_APP_BASE_URL;
 export default function App() {
