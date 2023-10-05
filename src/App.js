@@ -56,7 +56,7 @@ export default function App() {
       }
 
       const url = `${process.env.REACT_APP_BASE_URL}/api/resize-images`;
-      console.log('no query parameters');
+      console.log('no slash on backend');
       console.log(url);
       const response = await fetch(url, {
         method: 'POST',
@@ -92,7 +92,7 @@ export default function App() {
       setIsLoading(false);
     }
   };
-  console.log(process.env.NODE_ENV);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-l from-blue-300 to-purple-600">
       <Logo />
