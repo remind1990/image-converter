@@ -54,9 +54,9 @@ export default function App() {
         queryParams.append('height', sizes.height);
         queryParams.append('keys', JSON.stringify(sizes.keys));
       }
-
-      const url = `${process.env.REACT_APP_BASE_URL}api/resize-images`;
-      console.log('no slash on backend and front end');
+      const testUrl = 'http://localhost:3300';
+      const url = `https://sunrise-image-converter.herokuapp.com/api/resize-images`;
+      console.log('hardcoded link');
       console.log(url);
       const response = await fetch(url, {
         method: 'POST',
