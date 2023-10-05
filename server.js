@@ -10,37 +10,18 @@ const PORT = process.env.PORT || 3300;
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
+const corsOptions = {
+  origin:
+    'https://sunrise-image-converter-c88a9cda0bbb.herokuapp.com',
+  // You can also use a wildcard to allow requests from any origin:
+  // origin: '*',
+};
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 function generateUniqueId() {
   return uuid.v4();
 }
-// --- we in need to  resize only one image
-// app.post('/api/resize-image', upload.single('image'), (req, res) => {
-//   if (!req.files || req.files.length === 0) {
-//     return res.status(400).send('No images uploaded.');
-//   }
-//   console.log('got images 🎇');
-//   const resizedImages = [];
-//   const imageBuffer = req.file.buffer;
-//   sharp(imageBuffer)
-//     .resize({ width: 1920 })
-//     .toFormat('jpeg')
-//     .toBuffer()
-//     .then((outputBuffer) => {
-//       const imageName = `${Date.now()}_${Math.floor(
-//         Math.random() * 1000
-//       )}.jpg`;
-
-//       res.send(outputBuffer);
-//     })
-//     .catch((err) => {
-//       console.error('Error resizing image', err);
-//       res.status(500).send('Error resizing image.');
-//     });
-// });
 
 app.post('/api/resize-images', upload.any(), async (req, res) => {
   try {
