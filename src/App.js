@@ -19,7 +19,6 @@ export default function App() {
 
   const handleSizesChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
     setSizes({ ...sizes, [name]: value });
   };
   const handleFilesChange = async (event) => {
@@ -57,6 +56,7 @@ export default function App() {
       }
 
       const url = `${apiUrl}api/resize-images?${queryParams.toString()}`;
+
       console.log(url);
       const response = await fetch(url, {
         method: 'POST',
@@ -92,7 +92,7 @@ export default function App() {
       setIsLoading(false);
     }
   };
-
+  console.log(process.env.REACT_APP_BASE_URL, process.env.NODE_ENV);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-l from-blue-300 to-purple-600">
       <Logo />
