@@ -7,8 +7,8 @@ const params = {
 };
 const apiUrl =
   process.env.NODE_ENV === 'development'
-    ? 'http://localhost:3300/'
-    : process.env.REACT_APP_BASE_URL;
+    ? 'http://localhost:3300'
+    : 'https://sunrise-image-converter-c88a9cda0bbb.herokuapp.com';
 export default function App() {
   const [resizedImages, setResizedImages] = useState([]);
   const [sizes, setSizes] = useState(params);
@@ -55,9 +55,7 @@ export default function App() {
         queryParams.append('keys', JSON.stringify(sizes.keys));
       }
 
-      const url = `${
-        process.env.REACT_APP_BASE_URL
-      }/api/resize-images?${queryParams.toString()}`;
+      const url = `${apiUrl}/api/resize-images?${queryParams.toString()}`;
 
       console.log(url);
       const response = await fetch(url, {
