@@ -13,9 +13,11 @@ const upload = multer({ storage: storage });
 const corsOptions = {
   origin: '*',
 };
+
+app.use(express.static(__dirname + '/build'));
 app.use(express.json());
 app.use(cors(corsOptions));
-
+app.set('view engine', 'ejs');
 function generateUniqueId() {
   return uuid.v4();
 }
