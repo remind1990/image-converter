@@ -8,7 +8,7 @@ const params = {
 const apiUrl =
   process.env.NODE_ENV === 'production'
     ? 'http://localhost:3300'
-    : 'https://sunrise-image-converter-c88a9cda0bbb.herokuapp.com';
+    : 'https://sunrise-image-converter.herokuapp.com';
 export default function App() {
   const [resizedImages, setResizedImages] = useState([]);
   const [sizes, setSizes] = useState(params);
