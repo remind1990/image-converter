@@ -57,7 +57,7 @@ export default function App() {
 
       const url = `${
         process.env.REACT_APP_BASE_URL
-      }api/resize-images?${queryParams.toString()}`;
+      }/api/resize-images?${queryParams.toString()}`;
 
       console.log(url);
       const response = await fetch(url, {
@@ -94,7 +94,7 @@ export default function App() {
       setIsLoading(false);
     }
   };
-  console.log(process.env.REACT_APP_BASE_URL, process.env.NODE_ENV);
+  console.log(process.env.NODE_ENV);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-l from-blue-300 to-purple-600">
       <Logo />
