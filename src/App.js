@@ -31,7 +31,6 @@ export default function App() {
       const formDataIsEmpty = formData.get('image0') === null;
 
       if (formDataIsEmpty) {
-        console.log('formData is empty');
         return;
       } else {
         uploadMultiplyImages(formData);
@@ -56,7 +55,6 @@ export default function App() {
           ? process.env.REACT_APP_BASE_URL
           : testUrl;
       const url = `${appUrl}/api/resize-images?${queryParams.toString()}`;
-      console.log(url);
       const response = await fetch(url, {
         method: 'POST',
         body: formData,
