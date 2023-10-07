@@ -52,17 +52,18 @@ export default function App() {
       if (sizes?.width !== '' && sizes?.height !== '') {
         queryParams.append('width', sizes.width);
         queryParams.append('height', sizes.height);
-        queryParams.append('keys', JSON.stringify(sizes.keys));
       }
       const testUrl = 'http://localhost:3300';
-      const url = `https://sunrise-image-converter-c88a9cda0bbb.herokuapp.com/api/resize-images`;
-      console.log('hardcoded link');
+      const appUrl =
+        process.env.NODE_ENV === 'production'
+          ? process.env.REACT_APP_BASE_URL
+          : testUrl;
+      const url = `${appUrl}/api/resize-images?${queryParams.toString()}`;
       console.log(url);
       const response = await fetch(url, {
         method: 'POST',
         body: formData,
       });
-
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -92,7 +93,7 @@ export default function App() {
       setIsLoading(false);
     }
   };
-
+  console.log(process.env.NODE_ENV);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-l from-blue-300 to-purple-600">
       <Logo />
