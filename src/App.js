@@ -5,10 +5,7 @@ const params = {
   width: '',
   height: '',
 };
-const apiUrl =
-  process.env.NODE_ENV === 'production'
-    ? 'http://localhost:3300'
-    : 'https://sunrise-image-converter.herokuapp.com';
+
 export default function App() {
   const [resizedImages, setResizedImages] = useState([]);
   const [sizes, setSizes] = useState(params);
@@ -93,7 +90,6 @@ export default function App() {
       setIsLoading(false);
     }
   };
-  console.log(process.env.NODE_ENV);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-l from-blue-300 to-purple-600">
       <Logo />
