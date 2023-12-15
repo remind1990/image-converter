@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
+import ImageResize from 'image-resize';
 import Logo from './Logo';
 
 const params = {
@@ -18,86 +19,50 @@ export default function App() {
     const { name, value } = e.target;
     setSizes({ ...sizes, [name]: value });
   };
+
   const handleFilesChange = async (event) => {
     const files = Array.from(event.target.files);
-    const formData = new FormData();
+    setIsLoading(true);
     try {
-      await Promise.all(
+      const resizedImages = await Promise.all(
         files.map(async (file, index) => {
-          await formData.append(`image${index}`, file);
+          const imageResize = new ImageResize();
+          const imageUrl = await imageResize
+            .updateOptions({
+              format: 'jpg',
+              width: sizes.width || 1290,
+              height: sizes.height || 1920,
+            })
+            .play(file);
+          return {
+            imageUrl,
+            id: index,
+            name: file.name,
+          };
         })
       );
 
-      const formDataIsEmpty = formData.get('image0') === null;
-
-      if (formDataIsEmpty) {
-        return;
-      } else {
-        uploadMultiplyImages(formData);
-      }
-    } catch (error) {
-      console.error('Error while populating formData:', error);
-    }
-  };
-
-  const uploadMultiplyImages = async (formData) => {
-    setIsLoading(true);
-    try {
-      const queryParams = new URLSearchParams();
-
-      if (sizes?.width !== '' && sizes?.height !== '') {
-        queryParams.append('width', sizes.width);
-        queryParams.append('height', sizes.height);
-      }
-      const testUrl = 'http://localhost:3300';
-      const appUrl =
-        process.env.NODE_ENV === 'production'
-          ? process.env.REACT_APP_BASE_URL
-          : testUrl;
-      const url = `${appUrl}/api/resize-images?${queryParams.toString()}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        body: formData,
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const responseData = await response.json();
-      const resizedImagesArray = responseData.resizedImages;
-      const images = [];
-      resizedImagesArray.forEach((image) => {
-        const uint8Array = new Uint8Array(image.data.data);
-        const imageBlob = new Blob([uint8Array], {
-          type: 'image/jpeg',
-        });
-        const imageUrl = URL.createObjectURL(imageBlob);
-        const imageObject = {
-          imageUrl,
-          id: image.id,
-          name: image.name,
-        };
-
-        images.push(imageObject);
-      });
-      setResizedImages(images);
+      setResizedImages((prevImages) => [
+        ...prevImages,
+        ...resizedImages,
+      ]);
       setAnimate(true);
     } catch (error) {
-      console.error('Error uploading image', error);
-    } finally {
-      setIsLoading(false);
+      console.error('Error resizing images:', error);
     }
+    setIsLoading(false);
   };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-l from-blue-300 to-purple-600">
       <Logo />
       <div
-        className="bg-white overflow-auto  m-1 md:m-5 px-1 py-1 rounded-lg shadow-lg h-[90%] w-[90%] md:w-[70%]"
+        className="bg-white overflow-auto m-1 md:m-5 px-1 py-1 rounded-lg shadow-lg h-[90%] w-[90%] md:w-[70%]"
         ref={containerRef}
         style={{
           transition: 'height 0.5s ease-in-out',
           overflow: 'hidden',
-          height: resizedImages ? 'auto' : '200px',
+          height: resizedImages.length ? 'auto' : '200px',
         }}
       >
         <form className="flex flex-wrap gap-10">
@@ -137,7 +102,7 @@ export default function App() {
         </form>
         <div className="flex flex-wrap gap-5" ref={childRef}>
           {resizedImages.length > 0 &&
-            resizedImages.map((image, index) => (
+            resizedImages.map((image) => (
               <div
                 key={image.id}
                 style={{
@@ -156,9 +121,9 @@ export default function App() {
                     className="w-full h-full object-cover"
                   />
                   <a
-                    href={image?.imageUrl}
+                    href={image.imageUrl}
                     download={image.name}
-                    className="block text-center bg-gradient-to-r from-gray-900 via-gray-900 to-white text-white px-4 py-2  hover:bg-gray-900 hover:underline"
+                    className="block text-center bg-gradient-to-r from-gray-900 via-gray-900 to-white text-white px-4 py-2 hover:bg-gray-900 hover:underline"
                   >
                     Download Resized Image
                   </a>
