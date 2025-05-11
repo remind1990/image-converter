@@ -1,12 +1,11 @@
 import { useState, useRef } from "react";
 import Logo from "./Logo";
 import imageCompression from "browser-image-compression";
-import { uploadImageToCloudinary } from "./services/cloudinary.service";
 
 const params = {
   width: "720",
   height: "1280",
-  format: "jpg", // Default format
+  format: "image/jpeg",
 };
 
 export default function App() {
@@ -30,19 +29,19 @@ export default function App() {
         files.map(async (file, index) => {
           const options = {
             maxWidthOrHeight: Math.max(sizes.width || 1290, sizes.height || 1920),
-            initialQuality: 1, // Retain original quality
-            fileType: sizes.format || "image/jpeg", // Format conversion
+            initialQuality: 1,
+            fileType: sizes.format || "image/jpeg",
           };
 
-          console.log("Resizing image with options:", options);
-
           const compressedFile = await imageCompression(file, options);
-          const imageUrl = await uploadImageToCloudinary(compressedFile);
+          const imageUrl = URL.createObjectURL(compressedFile);
+
+          const extension = options.fileType.split("/")[1];
 
           return {
             imageUrl,
             id: index,
-            name: file.name.replace(/\.[^/.]+$/, "") + "." + options.fileType.split("/")[1],
+            name: file.name.replace(/\.[^/.]+$/, "") + "." + extension,
           };
         })
       );
@@ -112,7 +111,6 @@ export default function App() {
                 className="mb-4 p-2 border border-gray-300 rounded-lg"
               >
                 <option value="image/jpeg">JPG</option>
-                <option value="image/jpeg">JPEG</option>
                 <option value="image/png">PNG</option>
                 <option value="image/webp">WEBP</option>
               </select>
@@ -147,13 +145,31 @@ export default function App() {
                       Download Resized Image
                     </a>
                     <button
-                      onClick={() => {
-                        window.open(`https://www.photopea.com/#${image.imageUrl}`, "_blank");
+                      onClick={(e) => {
+                        e.preventDefault();
+
+                        fetch(image.imageUrl)
+                          .then((res) => res.blob())
+                          .then((blob) => {
+                            const blobUrl = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = blobUrl;
+                            a.download = image.name;
+                            a.click();
+
+                            setTimeout(() => {
+                              window.open("https://www.photopea.com", "_blank");
+                            }, 600);
+                          });
                       }}
                       className="block text-center bg-gradient-to-r from-gray-900 via-gray-900 to-white text-white px-4 py-2 hover:bg-gray-900 hover:underline"
                     >
-                      Edit with Photopea
+                      Download & Open in Photopea
                     </button>
+
+                    <p className="text-sm text-gray-500 text-center mt-2">
+                      Drag the downloaded file into Photopea to start editing.
+                    </p>
                   </span>
                 </div>
               ))}
