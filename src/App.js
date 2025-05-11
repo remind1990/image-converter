@@ -144,32 +144,13 @@ export default function App() {
                     >
                       Download Resized Image
                     </a>
+
                     <button
-                      onClick={(e) => {
-                        e.preventDefault();
-
-                        fetch(image.imageUrl)
-                          .then((res) => res.blob())
-                          .then((blob) => {
-                            const blobUrl = URL.createObjectURL(blob);
-                            const a = document.createElement("a");
-                            a.href = blobUrl;
-                            a.download = image.name;
-                            a.click();
-
-                            setTimeout(() => {
-                              window.open("https://www.photopea.com", "_blank");
-                            }, 600);
-                          });
-                      }}
                       className="block text-center bg-gradient-to-r from-gray-900 via-gray-900 to-white text-white px-4 py-2 hover:bg-gray-900 hover:underline"
+                      onClick={() => window.open("https://pixlr.com/e", "_blank")}
                     >
-                      Download & Open in Photopea
+                      Open Pixlr Editor
                     </button>
-
-                    <p className="text-sm text-gray-500 text-center mt-2">
-                      Drag the downloaded file into Photopea to start editing.
-                    </p>
                   </span>
                 </div>
               ))}
