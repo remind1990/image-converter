@@ -36,7 +36,8 @@ export default function App() {
           const compressedFile = await imageCompression(file, options);
           const imageUrl = URL.createObjectURL(compressedFile);
 
-          const extension = options.fileType.split("/")[1];
+        // Force the file extension to be .jpg if the format is JPEG
+        const extension = options.fileType === "image/jpeg" ? "jpg" : options.fileType.split("/")[1];
 
           return {
             imageUrl,
